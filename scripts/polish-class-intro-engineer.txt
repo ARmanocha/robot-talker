@@ -1,0 +1,16 @@
+[wave] Cześć! {Hi!}
+[point] Jestem jego osobistym asystentem! {I am his personal assistant!}
+
+[pause 0.2]
+
+[celebrate] Witamy na zajęciach z „Inżynierii zagrożeń środowiskowych”! {Welcome to the "Environmental Hazard Engineering" class!}
+[talk] Te zajęcia będą prowadzone po angielsku... {This class will be in English...}
+[thumbsup] Mam nadzieję, że wszystkim wam to odpowiada... {I hope this is OK with you all...}
+[pause 0]
+[think fast] Przepraszam... {Sorry...}
+[pause 0]
+[point] On ma nadzieję, że wam wszystkim też to odpowiada. {He hopes this will be OK for you all too.}
+[pause 1.5]
+[thumbsup] Dobrze, teraz ty przejmij pałeczkę! {OK, now you take over!}
+[wave] Do widzenia! {Goodbye!}
+[exit]

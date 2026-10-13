@@ -1,0 +1,68 @@
+' Talking Robot add-in for PowerPoint for Mac.
+' Adds a robot that walks onto the current slide and says your words.
+' Needs RobotTalker.scpt in ~/Library/Application Scripts/com.microsoft.Powerpoint/
+Option Explicit
+
+Private Const EFFECT_MEDIA_PLAY As Long = 83     ' msoAnimEffectMediaPlay
+Private Const TRIGGER_WITH_PREVIOUS As Long = 2  ' msoAnimTriggerWithPrevious
+
+' Called by the "Add talking robot" button on the Robot tab.
+Public Sub AddTalkingRobotButton(control As IRibbonControl)
+    AddTalkingRobot
+End Sub
+
+Public Sub AddTalkingRobot()
+    Dim sld As Slide
+    On Error Resume Next
+    Set sld = ActiveWindow.View.Slide
+    On Error GoTo 0
+    If sld Is Nothing Then
+        MsgBox "Click on a slide first, then try again.", vbInformation, "Talking Robot"
+        Exit Sub
+    End If
+
+    Dim words As String
+    words = InputBox("What should the robot say?" & vbCr & vbCr & _
+        "Optional actions, before the words they go with:" & vbCr & _
+        "[wave] [point] [thumbsup] [nod] [think] [celebrate] [pause]" & vbCr & vbCr & _
+        "It takes about 10 seconds to make.", "Talking Robot", "Hello everyone, welcome!")
+    If Len(Trim$(words)) = 0 Then Exit Sub
+
+    Dim result As String
+    On Error GoTo HelperMissing
+    result = AppleScriptTask("RobotTalker.scpt", "makeRobot", _
+        SlideBackgroundHex(sld) & "|robot-" & Format$(Now, "yyyymmdd-hhnnss") & "|" & words)
+    On Error GoTo 0
+    If Left$(result, 3) <> "OK:" Then
+        MsgBox "The robot couldn't be made:" & vbCr & vbCr & Mid$(result, 7), vbExclamation, "Talking Robot"
+        Exit Sub
+    End If
+
+    ' Bottom-left corner, 60% of the slide width, so the robot walks in from the slide's edge.
+    Dim w As Single, h As Single, shp As Shape
+    w = ActivePresentation.PageSetup.SlideWidth * 0.6
+    h = w * 9 / 16
+    Set shp = sld.Shapes.AddMediaObject2(Mid$(result, 4), msoFalse, msoTrue, _
+        0, ActivePresentation.PageSetup.SlideHeight - h, w, h)
+    shp.Name = "Talking robot"
+    sld.TimeLine.MainSequence.AddEffect shp, EFFECT_MEDIA_PLAY, , TRIGGER_WITH_PREVIOUS, 1
+    shp.Select
+    Exit Sub
+
+HelperMissing:
+    MsgBox "PowerPoint couldn't run the robot helper. It should be at:" & vbCr & vbCr & _
+        "~/Library/Application Scripts/com.microsoft.Powerpoint/RobotTalker.scpt" & vbCr & vbCr & _
+        Err.Description, vbExclamation, "Talking Robot"
+End Sub
+
+' Slide background as RRGGBB, so the video blends in. Falls back to white.
+Private Function SlideBackgroundHex(sld As Slide) As String
+    Dim c As Long
+    c = RGB(255, 255, 255)
+    On Error Resume Next
+    c = sld.Background.Fill.ForeColor.RGB
+    On Error GoTo 0
+    SlideBackgroundHex = Right$("0" & Hex$(c Mod 256), 2) & _
+        Right$("0" & Hex$((c \ 256) Mod 256), 2) & _
+        Right$("0" & Hex$((c \ 65536) Mod 256), 2)
+End Function

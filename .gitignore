@@ -1,0 +1,13 @@
+# Generated videos and slides
+output/
+# Built on first run from encoder.swift
+robot_encoder
+# Your saved add-in and its backups (rebuild with the steps in README.md)
+addin/*.ppam
+addin/*.bak
+# Old copy of the first version
+robot-talker/
+__pycache__/
+*.pyc
+.DS_Store
+.claude/
